@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Version>1.0.2</Version>
+    <EnableHarmony>true</EnableHarmony>
+    <EnableModDeploy>false</EnableModDeploy>
+    <EnableModZip>true</EnableModZip>
+    <ModFolderName>GlobalKegChest</ModFolderName>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.4.0" />
+    <ProjectReference Include="../GlobalKegChest.Core/GlobalKegChest.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="manifest.json;i18n/**;assets/**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

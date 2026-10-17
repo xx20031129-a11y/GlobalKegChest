@@ -1,0 +1,8 @@
+**/bin/
+**/obj/
+.vs/
+.superpowers/
+artifacts/
+dist/
+*.user
+*.log

@@ -1,0 +1,10 @@
+{
+  "chest.name": "Global Keg Chest",
+  "chest.description": "70 slots. Supplies every keg across all locations and collects finished drinks. Full chests leave products safely in their kegs.",
+  "command.host-only": "Only the host can run this command in a loaded save.",
+  "command.no-save": "Load a save first.",
+  "command.full": "Your inventory has no room for a keg chest.",
+  "command.given": "Added one Global Keg Chest to your inventory.",
+  "command.rescan": "Keg network rescanned; automation requested.",
+  "command.status": "Keg chests: {{chests}} | Kegs: {{kegs}} | Empty: {{empty}} | Working: {{working}} | Ready: {{ready}} | Paused after error: {{errors}} | Enabled: {{enabled}}"
+}

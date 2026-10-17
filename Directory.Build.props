@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <OS Condition="'$(OS)' == '' and $([MSBuild]::IsOSPlatform('Windows'))">Windows_NT</OS>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>10.0</LangVersion>
+    <Deterministic>true</Deterministic>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+  </PropertyGroup>
+</Project>

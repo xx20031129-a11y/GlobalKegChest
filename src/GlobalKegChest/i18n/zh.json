@@ -1,0 +1,10 @@
+{
+  "chest.name": "全域酿造箱",
+  "chest.description": "70 格。为所有地点的小桶自动装料，并收取加工成品。空间不足时，成品会安全留在小桶里。",
+  "command.host-only": "请由已加载存档的房主执行此命令。",
+  "command.no-save": "请先加载存档。",
+  "command.full": "背包空间不足，无法领取酿造箱。",
+  "command.given": "已向背包添加一个全域酿造箱。",
+  "command.rescan": "已重新扫描箱子和小桶，准备执行自动化。",
+  "command.status": "酿造箱：{{chests}} | 小桶：{{kegs}} | 空闲：{{empty}} | 加工中：{{working}} | 可收获：{{ready}} | 异常暂停：{{errors}} | 已启用：{{enabled}}"
+}
