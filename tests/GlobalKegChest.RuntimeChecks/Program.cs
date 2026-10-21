@@ -82,6 +82,79 @@ internal static class Program
             ChestPatches.AfterPlacement(item, location, 64, 64, false);
             Assert(ReferenceEquals(item, location.Objects[new Vector2(1, 1)]));
         });
+        Check("Placed chest survives location save/load as a native Chest", () =>
+        {
+            var location = Location("LocationRoundTrip");
+            var tile = new Vector2(3, 4);
+            var item = ItemRegistry.Create<SObject>(ChestIdentity.QualifiedItemId);
+            Place(location, tile, item);
+            ChestPatches.AfterPlacement(item, location, 3 * 64, 4 * 64, true);
+            Assert(location.Objects[tile] is GameChest);
+            ((GameChest)location.Objects[tile]).Items.Add(ItemRegistry.Create("(O)388", 7));
+
+            using var stream = new MemoryStream();
+            SaveGame.locationSerializer.Serialize(stream, location);
+            stream.Position = 0;
+            var restored = (GameLocation)SaveGame.locationSerializer.Deserialize(stream)!;
+            Assert(restored.Objects.TryGetValue(tile, out var restoredObject));
+            Assert(restoredObject is GameChest);
+            Equal(ChestIdentity.QualifiedItemId, restoredObject.QualifiedItemId);
+            Equal(7, ((GameChest)restoredObject).Items[0].Stack);
+        });
+        Check("Placed chest survives a full location net-state clone as a native Chest", () =>
+        {
+            var location = Location("LocationNetClone");
+            var tile = new Vector2(3, 4);
+            var item = ItemRegistry.Create<SObject>(ChestIdentity.QualifiedItemId);
+            Place(location, tile, item);
+            ChestPatches.AfterPlacement(item, location, 3 * 64, 4 * 64, true);
+            ((GameChest)location.Objects[tile]).Items.Add(ItemRegistry.Create("(O)388", 7));
+
+            var clone = new Netcode.NetRoot<GameLocation>(location).Clone().Value;
+            Assert(clone.Objects.TryGetValue(tile, out var clonedObject));
+            Assert(clonedObject is GameChest);
+            Equal(ChestIdentity.QualifiedItemId, clonedObject.QualifiedItemId);
+            Equal(7, ((GameChest)clonedObject).Items[0].Stack);
+        });
+        Check("An already connected location receives placed Object-to-Chest replacement", () =>
+        {
+            var location = Location("LocationNetDelta");
+            var tile = new Vector2(3, 4);
+            var item = ItemRegistry.Create<SObject>(ChestIdentity.QualifiedItemId);
+            Place(location, tile, item);
+            var hostRoot = new Netcode.NetRoot<GameLocation>(location);
+            var guestRoot = hostRoot.Clone();
+            Assert(guestRoot.Value.Objects[tile] is not GameChest);
+
+            item.Stack = 2;
+            using (var controlStream = new MemoryStream())
+            {
+                using (var writer = new BinaryWriter(controlStream, System.Text.Encoding.UTF8, leaveOpen: true))
+                    hostRoot.Write(writer);
+                controlStream.Position = 0;
+                using (var reader = new BinaryReader(controlStream, System.Text.Encoding.UTF8, leaveOpen: true))
+                    guestRoot.Read(reader);
+                for (int i = 0; i < 10; i++)
+                    guestRoot.TickTree();
+                Equal(2, guestRoot.Value.Objects[tile].Stack);
+            }
+
+            ChestPatches.AfterPlacement(item, location, 3 * 64, 4 * 64, true);
+            ((GameChest)location.Objects[tile]).Items.Add(ItemRegistry.Create("(O)388", 7));
+            using var stream = new MemoryStream();
+            using (var writer = new BinaryWriter(stream, System.Text.Encoding.UTF8, leaveOpen: true))
+                hostRoot.Write(writer);
+            stream.Position = 0;
+            using (var reader = new BinaryReader(stream, System.Text.Encoding.UTF8, leaveOpen: true))
+                guestRoot.Read(reader);
+            for (int i = 0; i < 10; i++)
+                guestRoot.TickTree();
+
+            Assert(guestRoot.Value.Objects.TryGetValue(tile, out var guestObject));
+            Assert(guestObject is GameChest);
+            Equal(ChestIdentity.QualifiedItemId, guestObject.QualifiedItemId);
+            Equal(7, ((GameChest)guestObject).Items[0].Stack);
+        });
         Check("Farming 7/8 recipe gate and existing-save grant", () =>
         {
             Game1.player.craftingRecipes.Remove(ChestIdentity.ItemId);

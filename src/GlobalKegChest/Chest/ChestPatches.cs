@@ -51,7 +51,20 @@ internal static class ChestPatches
             foreach (var pair in placed.modData.Pairs)
                 chest.modData[pair.Key] = pair.Value;
             chest.modData[ChestIdentity.SchemaKey] = "1";
-            location.Objects[tile] = chest;
+            // Reassigning an existing net-dictionary key doesn't send the new runtime
+            // type to connected farmhands. A remove/add pair does.
+            if (!location.Objects.Remove(tile))
+                return;
+            try
+            {
+                location.Objects.Add(tile, chest);
+            }
+            catch
+            {
+                if (!location.Objects.ContainsKey(tile))
+                    location.Objects.Add(tile, placed);
+                throw;
+            }
         }
         catch (Exception ex)
         {

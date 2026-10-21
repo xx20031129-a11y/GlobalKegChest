@@ -1,4 +1,5 @@
 using GlobalKegChest.Chest;
+using GlobalKegChest.Core;
 using StardewModdingAPI;
 using StardewValley;
 
@@ -6,6 +7,8 @@ namespace GlobalKegChest.Automation;
 
 internal sealed class AutomationCommands
 {
+    internal const string RescanMessageType = "Rescan";
+
     private readonly IModHelper helper;
     private readonly IMonitor monitor;
     private readonly AutomationController controller;
@@ -34,15 +37,9 @@ internal sealed class AutomationCommands
             monitor.Log(helper.Translation.Get(added ? "command.given" : "command.full"), LogLevel.Info);
             return;
         }
-        if (!Context.IsMainPlayer || Context.ScreenId != 0)
-        {
-            monitor.Log(helper.Translation.Get("command.host-only"), LogLevel.Warn);
-            return;
-        }
         if (action == "rescan")
         {
-            controller.RequestRescan();
-            monitor.Log(helper.Translation.Get("command.rescan"), LogLevel.Info);
+            RequestRescan();
             return;
         }
         if (action != "status")
@@ -62,5 +59,24 @@ internal sealed class AutomationCommands
             errors = controller.ErrorCount,
             enabled = config.Enabled
         }), LogLevel.Info);
+    }
+
+    /// <summary>The host owns the network state, so any other player asks the host to rescan.</summary>
+    private void RequestRescan()
+    {
+        var route = CommandRouting.Rescan(Context.IsMainPlayer, Context.ScreenId, Context.IsMultiplayer);
+        if (route == CommandRoute.RunLocally)
+        {
+            controller.RequestRescan();
+            monitor.Log(helper.Translation.Get("command.rescan"), LogLevel.Info);
+            return;
+        }
+        if (route == CommandRoute.Reject)
+        {
+            monitor.Log(helper.Translation.Get("command.host-only"), LogLevel.Warn);
+            return;
+        }
+        helper.Multiplayer.SendMessage("rescan", RescanMessageType, new[] { helper.ModRegistry.ModID });
+        monitor.Log(helper.Translation.Get("command.rescan-requested"), LogLevel.Info);
     }
 }

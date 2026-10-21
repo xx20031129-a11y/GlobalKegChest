@@ -1,7 +1,7 @@
 {
   "Name": "Global Keg Chest",
   "Author": "xx",
-  "Version": "1.0.2",
+  "Version": "1.0.3-beta.1",
   "Description": "A 70-slot chest that supplies and collects every placed keg, across all locations.",
   "UniqueID": "xx.GlobalKegChest",
   "EntryDll": "GlobalKegChest.dll",

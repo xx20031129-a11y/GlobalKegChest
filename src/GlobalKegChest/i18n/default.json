@@ -6,5 +6,6 @@
   "command.full": "Your inventory has no room for a keg chest.",
   "command.given": "Added one Global Keg Chest to your inventory.",
   "command.rescan": "Keg network rescanned; automation requested.",
+  "command.rescan-requested": "Asked the host to rescan the keg network; automation still runs on the host.",
   "command.status": "Keg chests: {{chests}} | Kegs: {{kegs}} | Empty: {{empty}} | Working: {{working}} | Ready: {{ready}} | Paused after error: {{errors}} | Enabled: {{enabled}}"
 }

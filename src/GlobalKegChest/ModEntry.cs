@@ -20,6 +20,13 @@ public sealed class ModEntry : Mod
         var controller = new AutomationController(Monitor, config);
         var commands = new AutomationCommands(helper, Monitor, controller, config);
         ChestPatches.Apply(new Harmony(ModManifest.UniqueID), Monitor);
+        helper.Events.Multiplayer.ModMessageReceived += (_, e) =>
+        {
+            if (e.FromModID != ModManifest.UniqueID || e.Type != AutomationCommands.RescanMessageType)
+                return;
+            if (Context.IsMainPlayer && Context.ScreenId == 0)
+                controller.RequestRescan();
+        };
         helper.Events.Content.AssetRequested += content.OnAssetRequested;
         helper.Events.Content.LocaleChanged += content.OnLocaleChanged;
         helper.Events.GameLoop.GameLaunched += (_, _) => content.CheckAssets(Monitor);
